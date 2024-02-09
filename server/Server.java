@@ -1,15 +1,14 @@
+package server;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.*;
-import java.net.*;
-import PROJECT_1.KeyValueStore;
 
 public class Server {
-    private static KeyValueStore keyValueStore = new KeyValueStore();
+    private static final KeyValueStore keyValueStore = new KeyValueStore();
 
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -24,7 +23,7 @@ public class Server {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected: " + clientSocket.getInetAddress());
+                System.out.println("client.Client connected: " + clientSocket.getInetAddress());
 
                 try {
                     handleClient(clientSocket);
@@ -32,7 +31,7 @@ public class Server {
                     e.printStackTrace();
                 } finally {
                     clientSocket.close();
-                    System.out.println("Client disconnected");
+                    System.out.println("client.Client disconnected");
                 }
             }
         } catch (IOException e) {
@@ -77,7 +76,7 @@ public class Server {
                 String storedValue = keyValueStore.get(key);
                 return (storedValue != null) ? "Value for key '" + key + "': " + storedValue : "Key '" + key + "' not found";
             case "DELETE":
-                String removedValue = keyValueStore.remove(key);
+                String removedValue = keyValueStore.delete(key);
                 return (removedValue != null) ? "Deleted key '" + key + "' with value '" + removedValue + "'" : "Key '" + key + "' not found";
             default:
                 return "Unsupported operation: " + operation;

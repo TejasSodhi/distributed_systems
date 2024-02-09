@@ -1,6 +1,8 @@
+package server;
+
 import java.util.HashMap;
 
-public class KeyValueStore {
+class KeyValueStore {
     private HashMap<String, String> store;
 
     public KeyValueStore() {
