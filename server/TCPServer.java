@@ -7,17 +7,15 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
+public class TCPServer implements IServer {
     private static final KeyValueStore keyValueStore = new KeyValueStore();
 
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            System.out.println("Usage: java Server <port>");
-            System.exit(1);
-        }
+    private static void handleClient(Socket clientSocket) throws IOException {
 
-        int portNumber = Integer.parseInt(args[0]);
+    }
 
+    @Override
+    public void listen(int portNumber) {
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
             System.out.println("Server is listening on port " + portNumber);
 
@@ -39,10 +37,11 @@ public class Server {
         }
     }
 
-    private static void handleClient(Socket clientSocket) throws IOException {
+    @Override
+    public void handleRequest(Socket clientSocket) throws IOException {
         try (
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
+          BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+          PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
         ) {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
@@ -55,7 +54,7 @@ public class Server {
         }
     }
 
-    private static String processRequest(String inputLine) {
+    public String processRequest(String inputLine) {
         String[] tokens = inputLine.split(" ");
         if (tokens.length < 2) {
             return "Invalid request format";

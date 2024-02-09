@@ -3,7 +3,7 @@ package server;
 import java.util.HashMap;
 
 class KeyValueStore {
-    private HashMap<String, String> store;
+    private final HashMap<String, String> store;
 
     public KeyValueStore() {
         this.store = new HashMap<>();
