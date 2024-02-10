@@ -10,10 +10,6 @@ import java.net.Socket;
 public class TCPServer implements IServer {
     private static final KeyValueStore keyValueStore = new KeyValueStore();
 
-    private static void handleClient(Socket clientSocket) throws IOException {
-
-    }
-
     @Override
     public void listen(int portNumber) {
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
@@ -24,7 +20,7 @@ public class TCPServer implements IServer {
                 System.out.println("client.Client connected: " + clientSocket.getInetAddress());
 
                 try {
-                    handleClient(clientSocket);
+                    handleRequest(clientSocket);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
