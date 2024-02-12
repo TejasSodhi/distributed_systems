@@ -34,6 +34,9 @@ public class TCPServer extends AbstractServer {
 
     @Override
     public void handleRequest(Socket clientSocket) throws IOException {
+
+        clientSocket.setSoTimeout(5000);
+
         try (
           BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
           PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
@@ -46,6 +49,8 @@ public class TCPServer extends AbstractServer {
 
                 out.println(response);
             }
+        } catch (IOException e) {
+            System.err.println("Timeout occurred. Server did not respond within the specified time.");
         }
     }
 }
