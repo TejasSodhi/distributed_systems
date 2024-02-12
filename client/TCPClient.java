@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.io.*;
-import java.net.*;
 
-public class Client {
+public class TCPClient {
     public static void main(String[] args) {
         if (args.length != 3) {
             System.out.println("Usage: java client.Client <serverIP> <port> <protocol>");
@@ -27,11 +25,20 @@ public class Client {
         ) {
             System.out.println("Connected to the server");
 
-            // Example: send PUT request
-            out.println("PUT key value");
+            int n = 100;
+            for(int i = 0; i < n; i++) {
+                String putString = "PUT key" + i + " value" + i;
+                out.println(putString);
+                String responseFromServer = in.readLine();
+                System.out.println(responseFromServer);
+            }
 
-            String responseFromServer = in.readLine();
-            System.out.println(responseFromServer);
+            for(int i = 0; i < n; i++) {
+                String putString = "GET key" + i;
+                out.println(putString);
+                String responseFromServer = in.readLine();
+                System.out.println(responseFromServer);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
