@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+
 public class Client {
     private static final int TIMEOUT_DURATION = 5000;
     private static final int NUM_OPERATIONS = 5;
@@ -26,6 +27,8 @@ public class Client {
         ) {
             System.out.println("Connected to the server");
 
+            client.ClientLogger.log("Connected to the server");
+
             //PUT 5 operations
             for (int i = 1; i <= NUM_OPERATIONS; i++) {
                 sendRequest(out, in, "PUT key" + i + " value" + i);
@@ -46,16 +49,17 @@ public class Client {
     }
 
     private static void sendRequest(PrintWriter out, BufferedReader in, String request) throws IOException {
-        Thread timerThread = new Thread(() -> {
-            try {
-                Thread.sleep(TIMEOUT_DURATION);
-                System.err.println("Timeout occurred. No response from server for request: " + request);
-                System.exit(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        timerThread.start();
+        // Thread timerThread = new Thread(() -> {
+        //     try {
+        //         Thread.sleep(TIMEOUT_DURATION);
+        //         System.err.println("Timeout occurred. No response from server for request: " + request);
+        //         ClientLogger.log("Timeout occurred. No response from server for request: " + request);
+        //         System.exit(1);
+        //     } catch (InterruptedException e) {
+        //         e.printStackTrace();
+        //     }
+        // });
+        // timerThread.start();
 
         // Send request to server
         out.println(request);
@@ -63,8 +67,10 @@ public class Client {
         // Receive response from server
         String responseFromServer = in.readLine();
         System.out.println(responseFromServer);
+        // Log response
+        client.ClientLogger.log("Response from server: " + responseFromServer);
 
         // Interrupt the timer thread as response received within timeout duration
-        timerThread.interrupt();
+        // timerThread.interrupt();
     }
 }
