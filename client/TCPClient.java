@@ -58,17 +58,17 @@ public class TCPClient {
     }
 
     private static void sendRequest(PrintWriter out, BufferedReader in, String request) throws IOException {
-        //TODO: Correct timeouts
-        Thread timerThread = new Thread(() -> {
-            try {
-                Thread.sleep(TIMEOUT_DURATION);
-                System.err.println("Timeout occurred. No response from server for request: " + request);
-                System.exit(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        timerThread.start();
+        // Thread timerThread = new Thread(() -> {
+        //     try {
+        //         Thread.sleep(TIMEOUT_DURATION);
+        //         System.err.println("Timeout occurred. No response from server for request: " + request);
+        //         ClientLogger.log("Timeout occurred. No response from server for request: " + request);
+        //         System.exit(1);
+        //     } catch (InterruptedException e) {
+        //         e.printStackTrace();
+        //     }
+        // });
+        // timerThread.start();
 
         // Send request to server
         out.println(request);
@@ -76,8 +76,10 @@ public class TCPClient {
         // Receive response from server
         String responseFromServer = in.readLine();
         System.out.println(responseFromServer);
+        // Log response
+        client.ClientLogger.log("Response from server: " + responseFromServer);
 
         // Interrupt the timer thread as response received within timeout duration
-        timerThread.interrupt();
+        // timerThread.interrupt();
     }
 }
