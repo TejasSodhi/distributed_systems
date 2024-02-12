@@ -77,8 +77,7 @@ public class TCPClient {
         String responseFromServer = in.readLine();
         System.out.println(responseFromServer);
         // Log response
-        client.ClientLogger.log("Response from server: " + responseFromServer);
-
+        ClientLogger.log("Response from server: " + responseFromServer);
         // Interrupt the timer thread as response received within timeout duration
         // timerThread.interrupt();
     }
