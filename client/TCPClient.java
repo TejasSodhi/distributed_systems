@@ -1,10 +1,14 @@
+package client;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.io.*;
+import java.net.*;
 
-public class Client {
+public class TCPClient {
     private static final int TIMEOUT_DURATION = 5000;
     private static final int NUM_OPERATIONS = 5;
 
@@ -26,11 +30,24 @@ public class Client {
         ) {
             System.out.println("Connected to the server");
 
+            int n = 100;
+            for(int i = 0; i < n; i++) {
+                String putString = "PUT key" + i + " value" + i;
+                out.println(putString);
+                String responseFromServer = in.readLine();
+                System.out.println(responseFromServer);
+            }
             //PUT 5 operations
             for (int i = 1; i <= NUM_OPERATIONS; i++) {
                 sendRequest(out, in, "PUT key" + i + " value" + i);
             }
 
+            for(int i = 0; i < n; i++) {
+                String putString = "GET key" + i;
+                out.println(putString);
+                String responseFromServer = in.readLine();
+                System.out.println(responseFromServer);
+            }
             //GET 5 operations
             for (int i = 1; i <= NUM_OPERATIONS; i++) {
                 sendRequest(out, in, "GET key" + i);

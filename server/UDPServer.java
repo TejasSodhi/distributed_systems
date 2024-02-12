@@ -11,17 +11,18 @@ public class UDPServer extends AbstractServer {
 
     try {
       aSocket = new DatagramSocket(portNumber);
-      byte[] buffer = new byte[1000];
 
       while(true) {
+        byte[] buffer = new byte[1000];
+
         DatagramPacket request = new DatagramPacket(buffer,
           buffer.length);
         aSocket.receive(request);
 
-        String msg = new String(request.getData(), StandardCharsets.UTF_8);
-        System.out.println(msg);
-        String response = processRequest(msg);
 
+        String msg = new String(request.getData(), 0, request.getLength());
+
+        String response = processRequest(msg);
         DatagramPacket reply = new DatagramPacket(response.getBytes(),
           response.getBytes().length, request.getAddress(), request.getPort());
 

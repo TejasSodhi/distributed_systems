@@ -35,7 +35,6 @@ public class UDPClient {
       // Send GET requests
       for(int i = 0; i < n; i++) {
         String getString = "GET key" + i;
-        System.out.println(getString);
         byte [] m = getString.getBytes();
         DatagramPacket request =
           new DatagramPacket(m, m.length, aHost, serverPort);
@@ -43,10 +42,8 @@ public class UDPClient {
         byte[] buffer = new byte[1000];
         DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
         aSocket.receive(reply);
-        System.out.println("GET Reply: " + new String(reply.getData(), 0, reply.getLength()));
+        System.out.println("GET Reply: " + new String(reply.getData()));
       }
-
-
     }
     catch (SocketException e) {
       System.out.println("Socket: " + e.getMessage());
