@@ -41,7 +41,7 @@ src
 2 directories, 19 files
 ```
 * Compile the code using `javac server/*.java client/*.java`
-* server usage should then be similar to `java server.ServerApp <tcp-port-number> <udp-port-number>`
+* server usage should then be similar to `java server.ServerAppTCP <tcp-port-number> <udp-port-number>`
 * client usage should then be similar to `java client.ClientApp <host-name> <port-number> <protocol>`
 #### Dockerfile
 
@@ -59,8 +59,8 @@ FROM bellsoft/liberica-openjdk-alpine-musl:11 AS server-build
 COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp
 RUN javac server/*.java
-# cmd to run server locally - java server.ServerApp 1111 5555
-CMD ["java", "server.ServerApp", "1111", "5555"]
+# cmd to run server locally - java server.ServerAppTCP 1111 5555
+CMD ["java", "server.ServerAppTCP", "1111", "5555"]
 ```
 
 ##### 1. Build 
