@@ -4,18 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.UUID;
 
 
 public class TCPClient {
-    private static final int TIMEOUT_DURATION = 1;
-    private static final int NUM_OPERATIONS = 5;
-
-    private static final int TIMEOUT_MS = 5000;
-
     public static void main(String[] args) {
         if (args.length != 2) {
             System.out.println("Usage: java client.Client <serverIP> <port>");
@@ -25,13 +19,6 @@ public class TCPClient {
         String serverIP = args[0];
         int serverPort = Integer.parseInt(args[1]);
 
-//        Socket socket = new Socket();
-//        try{
-//            socket.connect(new InetSocketAddress(serverIP, serverPort), 5000);
-//        } catch (IOException e){
-//            System.out.println("*************failed here*********");
-//            e.printStackTrace();
-//        }
         Socket socket = null;
         try {
             socket = new Socket(serverIP, serverPort);
@@ -45,7 +32,6 @@ public class TCPClient {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
         ) {
-
             System.out.println("Connected to the server");
             ClientLogger.log("Connected to the server");
 
@@ -57,10 +43,6 @@ public class TCPClient {
                 String putString = requestId + "::PUT::key" + i + "::value" + i;
                 sendRequest(out, in, putString);
             }
-//            //PUT 5 operations
-//            for (int i = 1; i <= NUM_OPERATIONS; i++) {
-//                sendRequest(out, in, "PUT key" + i + " value" + i);
-//            }
 
             for(int i = 0; i < n; i++) {
                 UUID uuid = UUID.randomUUID();
@@ -69,15 +51,6 @@ public class TCPClient {
                 String getString = requestId + "::GET::key" + i;
                 sendRequest(out, in, getString);
             }
-//            //GET 5 operations
-//            for (int i = 1; i <= NUM_OPERATIONS; i++) {
-//                sendRequest(out, in, "GET key" + i);
-//            }
-
-            // DELETE 5 operations
-//            for (int i = 1; i <= NUM_OPERATIONS; i++) {
-//                sendRequest(out, in, "DELETE key" + i);
-//            }
         } catch (IOException e) {
             e.printStackTrace();
         }

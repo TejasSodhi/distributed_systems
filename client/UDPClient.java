@@ -20,23 +20,16 @@ public class UDPClient {
       InetAddress aHost = InetAddress.getByName(args[0]);
       int serverPort = Integer.parseInt(args[1]);
 
-      // TODO: Refactor the below into identical methods
       // Send PUT requests
       for(int i = 0; i < n; i++) {
-        UUID uuid = UUID.randomUUID();
-        String requestId = uuid.toString();
-
-        String putString = requestId + "::PUT::key" + i + "::value" + i;
+        String putString = generateUUID() + "::PUT::key" + i + "::value" + i;
 
         sendRequest(aSocket,putString,aHost,serverPort);
       }
 
       // Send GET requests
       for(int i = 0; i < n; i++) {
-        UUID uuid = UUID.randomUUID();
-        String requestId = uuid.toString();
-
-        String getString = requestId + "::GET::key" + i;
+        String getString = generateUUID() + "::GET::key" + i;
 
         sendRequest(aSocket,getString,aHost,serverPort);
       }
@@ -57,6 +50,11 @@ public class UDPClient {
       if (aSocket != null)
         aSocket.close();
     }
+  }
+
+  private static String generateUUID() {
+    UUID uuid = UUID.randomUUID();
+    return uuid.toString();
   }
 
   private static void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost, int serverPort) throws IOException {
