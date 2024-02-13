@@ -12,6 +12,7 @@ public class TCPServer extends AbstractServer {
     @Override
     public void listen(int portNumber) {
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
+
             System.out.println("Server is listening on port " + portNumber);
             serverLogger.log("Server is listening on port " + portNumber);
 
@@ -39,7 +40,7 @@ public class TCPServer extends AbstractServer {
     @Override
     public void handleRequest(Socket clientSocket) throws IOException {
 
-        clientSocket.setSoTimeout(5000);
+//        clientSocket.setSoTimeout(5000);
 
         try (
           BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
