@@ -44,7 +44,7 @@ public class UDPServer extends AbstractServer {
         DatagramPacket reply = new DatagramPacket(response.getBytes(),
           response.getBytes().length, request.getAddress(), request.getPort());
 
-        aSocket.send(reply);
+//        aSocket.send(reply);
       }
     }
     catch (SocketException e) {

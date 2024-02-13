@@ -27,20 +27,8 @@ public class UDPClient {
         String requestId = uuid.toString();
 
         String putString = requestId + "::PUT::key" + i + "::value" + i;
-        byte [] m = putString.getBytes();
-        DatagramPacket request =
-          new DatagramPacket(m, m.length, aHost, serverPort);
-        aSocket.send(request);
-        byte[] buffer = new byte[1000];
-        DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
-        aSocket.receive(reply);
-        String response = new String(reply.getData(), 0, reply.getLength());
-        String[] responseToken = response.split(":");
-        if(!responseToken[0].equals(requestId)) {
-          ClientLogger.log("Received Malformed response for request: " + requestId + " ; Received response for " + responseToken[0]);
-        } else {
-          System.out.println("PUT Reply: " + new String(reply.getData(), 0, reply.getLength()));
-        }
+
+        sendRequest(aSocket,putString,aHost,serverPort);
       }
 
       // Send GET requests
@@ -49,20 +37,8 @@ public class UDPClient {
         String requestId = uuid.toString();
 
         String getString = requestId + "::GET::key" + i;
-        byte [] m = getString.getBytes();
-        DatagramPacket request =
-          new DatagramPacket(m, m.length, aHost, serverPort);
-        aSocket.send(request);
-        byte[] buffer = new byte[1000];
-        DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
-        aSocket.receive(reply);
-        String response = new String(reply.getData(), 0, reply.getLength());
-        String[] responseToken = response.split(":");
-        if(!responseToken[0].equals(requestId)) {
-          ClientLogger.log("Received Malformed response for request: " + requestId + " ; Received response for " + responseToken[0]);
-        } else {
-          System.out.println("PUT Reply: " + new String(reply.getData(), 0, reply.getLength()));
-        }
+
+        sendRequest(aSocket,getString,aHost,serverPort);
       }
     }
     catch (SocketException e) {
@@ -80,6 +56,30 @@ public class UDPClient {
     finally {
       if (aSocket != null)
         aSocket.close();
+    }
+  }
+
+  private static void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost, int serverPort) throws IOException {
+    String[] requestToken = requestString.split("::");
+    String requestId = requestToken[0];
+    String action = requestToken[1];
+    byte [] m = requestString.getBytes();
+    DatagramPacket request = new DatagramPacket(m, m.length, aHost, serverPort);
+    aSocket.send(request);
+    aSocket.setSoTimeout(5000);
+    byte[] buffer = new byte[1000];
+    DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
+    try{
+      aSocket.receive(reply);
+      String response = new String(reply.getData(), 0, reply.getLength());
+      String[] responseToken = response.split(":");
+      if(!responseToken[0].equals(requestId)) {
+        ClientLogger.log("Received Malformed response for request: " + requestId + " ; Received response for " + responseToken[0]);
+      } else {
+        System.out.println(action+" Reply: " + new String(reply.getData(), 0, reply.getLength()));
+      }
+    } catch(SocketTimeoutException e){
+      ClientLogger.log("Received no response from server for request: " + requestId);
     }
   }
 }
