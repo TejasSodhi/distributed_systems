@@ -13,14 +13,13 @@ public class TCPClient {
     private static final int NUM_OPERATIONS = 5;
 
     public static void main(String[] args) {
-        if (args.length != 3) {
-            System.out.println("Usage: java client.Client <serverIP> <port> <protocol>");
+        if (args.length != 2) {
+            System.out.println("Usage: java client.Client <serverIP> <port>");
             System.exit(1);
         }
 
         String serverIP = args[0];
         int serverPort = Integer.parseInt(args[1]);
-        String protocol = args[2].toUpperCase();
 
         try (
             Socket socket = new Socket(serverIP, serverPort);
@@ -36,7 +35,7 @@ public class TCPClient {
                 UUID uuid = UUID.randomUUID();
                 String requestId = uuid.toString();
 
-                String putString = requestId + " PUT key" + i + " value" + i;
+                String putString = requestId + "::PUT::key" + i + "::value" + i;
                 sendRequest(out, in, putString);
             }
 //            //PUT 5 operations
@@ -48,7 +47,7 @@ public class TCPClient {
                 UUID uuid = UUID.randomUUID();
                 String requestId = uuid.toString();
 
-                String getString = requestId + " GET key" + i;
+                String getString = requestId + "::GET::key" + i;
                 sendRequest(out, in, getString);
             }
 //            //GET 5 operations

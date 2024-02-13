@@ -2,9 +2,10 @@ package server;
 
 public abstract class AbstractServer implements IServer {
   private static final KeyValueStore keyValueStore = new KeyValueStore();
+  static final ServerLogger serverLogger = new ServerLogger();
 
   public String processRequest(String inputLine) {
-    String[] tokens = inputLine.split(" ");
+    String[] tokens = inputLine.split("::");
     System.out.println(inputLine);
     if (tokens.length < 3) {
       return "Invalid request format";

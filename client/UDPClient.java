@@ -20,12 +20,13 @@ public class UDPClient {
       InetAddress aHost = InetAddress.getByName(args[0]);
       int serverPort = Integer.parseInt(args[1]);
 
+      // TODO: Refactor the below into identical methods
       // Send PUT requests
       for(int i = 0; i < n; i++) {
         UUID uuid = UUID.randomUUID();
         String requestId = uuid.toString();
 
-        String putString = requestId + " PUT key" + i + " value" + i;
+        String putString = requestId + "::PUT::key" + i + "::value" + i;
         byte [] m = putString.getBytes();
         DatagramPacket request =
           new DatagramPacket(m, m.length, aHost, serverPort);
@@ -47,7 +48,7 @@ public class UDPClient {
         UUID uuid = UUID.randomUUID();
         String requestId = uuid.toString();
 
-        String getString = requestId + " GET key" + i;
+        String getString = requestId + "::GET::key" + i;
         byte [] m = getString.getBytes();
         DatagramPacket request =
           new DatagramPacket(m, m.length, aHost, serverPort);
@@ -55,7 +56,13 @@ public class UDPClient {
         byte[] buffer = new byte[1000];
         DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
         aSocket.receive(reply);
-        System.out.println("GET Reply: " + new String(reply.getData()));
+        String response = new String(reply.getData(), 0, reply.getLength());
+        String[] responseToken = response.split(":");
+        if(!responseToken[0].equals(requestId)) {
+          ClientLogger.log("Received Malformed response for request: " + requestId + " ; Received response for " + responseToken[0]);
+        } else {
+          System.out.println("PUT Reply: " + new String(reply.getData(), 0, reply.getLength()));
+        }
       }
     }
     catch (SocketException e) {

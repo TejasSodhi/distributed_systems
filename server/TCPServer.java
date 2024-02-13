@@ -9,8 +9,6 @@ import java.net.Socket;
 
 public class TCPServer extends AbstractServer {
 
-    private static final ServerLogger serverLogger = new ServerLogger();
-
     @Override
     public void listen(int portNumber) {
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
@@ -60,11 +58,11 @@ public class TCPServer extends AbstractServer {
                 out.println(response);
                 serverLogger.logResponse(clientSocket.getInetAddress(),response);
             }
-            int packetLength = requestBuilder.toString().getBytes().length;
+//            int packetLength = requestBuilder.toString().getBytes().length;
 
         } catch (IOException e) {
             System.err.println("Timeout occurred. Server did not respond within the specified time.");
-            serverLogger.logMalformedRequest(clientSocket.getInetAddress(), packetLength);
+            serverLogger.logMalformedRequest(clientSocket.getInetAddress());
 
         }
     }
