@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.UUID;
 
 
 public class TCPClient {
@@ -31,7 +32,10 @@ public class TCPClient {
 
             int n = 100;
             for(int i = 0; i < n; i++) {
-                String putString = "PUT key" + i + " value" + i;
+                UUID uuid = UUID.randomUUID();
+                String requestId = uuid.toString();
+
+                String putString = requestId + " PUT key" + i + " value" + i;
                 sendRequest(out, in, putString);
             }
 //            //PUT 5 operations
@@ -40,7 +44,10 @@ public class TCPClient {
 //            }
 
             for(int i = 0; i < n; i++) {
-                String getString = "GET key" + i;
+                UUID uuid = UUID.randomUUID();
+                String requestId = uuid.toString();
+
+                String getString = requestId + " GET key" + i;
                 sendRequest(out, in, getString);
             }
 //            //GET 5 operations

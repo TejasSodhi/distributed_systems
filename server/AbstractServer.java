@@ -5,29 +5,31 @@ public abstract class AbstractServer implements IServer {
 
   public String processRequest(String inputLine) {
     String[] tokens = inputLine.split(" ");
-    if (tokens.length < 2) {
+    System.out.println(inputLine);
+    if (tokens.length < 3) {
       return "Invalid request format";
     }
 
-    String operation = tokens[0];
-    String key = tokens[1];
-    String value = tokens.length > 2 ? tokens[2] : null;
+    String requestId = tokens[0];
+    String operation = tokens[1];
+    String key = tokens[2];
+    String value = tokens.length > 3 ? tokens[3] : null;
 
     switch (operation.toUpperCase()) {
       case "PUT":
         if (value == null) {
-          return "PUT operation requires a value";
+          return requestId + ": PUT operation requires a value";
         }
         keyValueStore.put(key, value);
-        return "Key '" + key + "' stored with value '" + value + "'";
+        return requestId + ": Key '" + key + "' stored with value '" + value + "'";
       case "GET":
         String storedValue = keyValueStore.get(key);
-        return (storedValue != null) ? "Value for key '" + key + "': " + storedValue : "Key '" + key + "' not found";
+        return (storedValue != null) ? requestId + ": Value for key '" + key + "': " + storedValue : "Key '" + key + "' not found";
       case "DELETE":
         String removedValue = keyValueStore.delete(key);
-        return (removedValue != null) ? "Deleted key '" + key + "' with value '" + removedValue + "'" : "Key '" + key + "' not found";
+        return (removedValue != null) ? requestId + ": Deleted key '" + key + "' with value '" + removedValue + "'" : "Key '" + key + "' not found";
       default:
-        return "Unsupported operation: " + operation;
+        return requestId + ": Unsupported operation: " + operation;
     }
   }
 }
