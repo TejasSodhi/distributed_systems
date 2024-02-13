@@ -29,6 +29,7 @@ public class TCPClient {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
         ) {
             System.out.println("Connected to the server");
+            ClientLogger.log("Connected to the server");
 
             int n = 100;
             for(int i = 0; i < n; i++) {
