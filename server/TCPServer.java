@@ -7,6 +7,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * This represents a TCP based server which listens at a given port number for TCP client requests.
+ */
 public class TCPServer extends AbstractServer {
 
     @Override
@@ -17,6 +20,7 @@ public class TCPServer extends AbstractServer {
             serverLogger.log("Server is listening on port " + portNumber);
 
             while (true) {
+                // Start listening to client requests and creating client socket
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("client.Client connected: " + clientSocket.getInetAddress());
                 serverLogger.logRequest(clientSocket.getInetAddress(), "Client connected");
@@ -26,10 +30,10 @@ public class TCPServer extends AbstractServer {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
+                    // log information when client closes connection
                     clientSocket.close();
                     System.out.println("client.Client disconnected");
                     serverLogger.log("Client disconnected: " + clientSocket.getInetAddress());
-
                 }
             }
         } catch (IOException e) {
@@ -43,20 +47,23 @@ public class TCPServer extends AbstractServer {
           BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
           PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)
         ) {
-            StringBuilder requestBuilder = new StringBuilder();
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 System.out.println("Received from client: " + inputLine);
+                // log client request information
                 serverLogger.logRequest(clientSocket.getInetAddress(), inputLine);
 
-                requestBuilder.append(inputLine).append("\n");
-
+                // get information from the key value store
                 String response = processRequest(inputLine);
 
+                // write back the response to the client
                 out.println(response);
+
+                // log the response information
                 serverLogger.logResponse(clientSocket.getInetAddress(),response);
             }
         } catch (IOException e) {
+            // Log information about timed out requests.
             System.err.println("Timeout occurred. Server did not respond within the specified time.");
             serverLogger.logMalformedRequest(clientSocket.getInetAddress());
 
