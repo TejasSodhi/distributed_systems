@@ -3,52 +3,41 @@ package client;
 import java.net.*;
 import java.io.*;
 import java.util.UUID;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
-public class UDPClient {
+/**
+ * This represents the UDP client which communicates to the UDP server over a given port and host
+ * address.
+ */
+public class UDPClient extends AbstractClient {
+  @Override
+  public void startClient(String serverIp, int portNum) {
+    try (DatagramSocket aSocket = new DatagramSocket();
+      BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
+      InetAddress aHost = InetAddress.getByName(serverIp);
+      populateKeyValues(aSocket, aHost, portNum);
+      while (true) {
+        String request = generateRequestFromUserChoice(userInput);
+        if(request.isEmpty()) {
+          continue;
+        }
+        sendRequest(aSocket, request, aHost, portNum);
 
-  public static void main(String[] args) {
-    DatagramSocket aSocket = null;
-    if (args.length < 2) {
-      System.out.println(
-        "Usage: java UDPClient <Host name> <Port number>");
-      System.exit(1);
-    }
-
-    try {
-      aSocket = new DatagramSocket();
-      int n = 100;
-      InetAddress aHost = InetAddress.getByName(args[0]);
-      int serverPort = Integer.parseInt(args[1]);
-
-      // Send PUT requests
-      for(int i = 0; i < n; i++) {
-        String putString = generateUUID() + "::PUT::key" + i + "::value" + i;
-
-        sendRequest(aSocket,putString,aHost,serverPort);
+        System.out.print("Do you want to perform another operation? (yes/no): ");
+        String anotherOperation = userInput.readLine().toLowerCase();
+        if (!anotherOperation.equals("yes")) {
+          break;
+        }
       }
-
-      // Send GET requests
-      for(int i = 0; i < n; i++) {
-        String getString = generateUUID() + "::GET::key" + i;
-
-        sendRequest(aSocket,getString,aHost,serverPort);
-      }
-    }
-    catch (SocketException e) {
+    } catch (SocketException e) {
       System.out.println("Socket: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.out.println("IO: " + e.getMessage());
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException e) {
       System.out.println("Invalid port number: " + e.getMessage());
-    }
-    catch (ArrayIndexOutOfBoundsException e) {
+    } catch (ArrayIndexOutOfBoundsException e) {
       System.out.println("Invalid arguments: " + e.getMessage());
-    }
-    finally {
-      if (aSocket != null)
-        aSocket.close();
     }
   }
 
@@ -57,27 +46,70 @@ public class UDPClient {
     return uuid.toString();
   }
 
-  private static void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost, int serverPort) throws IOException {
-    String[] requestToken = requestString.split("::");
-    String requestId = requestToken[0];
-    String action = requestToken[1];
+  private static long generateChecksum(String requestString) {
     byte [] m = requestString.getBytes();
+    Checksum crc32 = new CRC32();
+    crc32.update(m, 0, m.length);
+    return crc32.getValue();
+  }
+
+  private static void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost,
+      int serverPort) throws IOException {
+
+    // Parse request information from the request string.
+    String[] requestToken = requestString.split("::");
+    String action = requestToken[1];
+
+    // creating datagram packet
+    long requestId = generateChecksum(requestString);
+    requestString = requestId + "::" + requestString;
+
+    byte[] m = requestString.getBytes();
     DatagramPacket request = new DatagramPacket(m, m.length, aHost, serverPort);
+
+    // sending datagram packet
     aSocket.send(request);
+
+    // setting timeout of 5 seconds for udp request and waiting for response from server
     aSocket.setSoTimeout(5000);
     byte[] buffer = new byte[1000];
     DatagramPacket reply = new DatagramPacket(buffer, buffer.length);
-    try{
+
+    try {
+      // receive response
       aSocket.receive(reply);
       String response = new String(reply.getData(), 0, reply.getLength());
       String[] responseToken = response.split(":");
-      if(!responseToken[0].equals(requestId)) {
-        ClientLogger.log("Received Malformed response for request: " + requestId + " ; Received response for " + responseToken[0]);
+      long responseRequestId = Long.parseLong(responseToken[0]);
+
+      // validating malformed responses from server
+      if(responseRequestId != requestId) {
+        ClientLogger.log("Received Malformed response for request: " + requestId +
+          " ; Received response for " + responseToken[0]);
       } else {
+        ClientLogger.log("Received response " + response);
         System.out.println(action+" Reply: " + new String(reply.getData(), 0, reply.getLength()));
       }
-    } catch(SocketTimeoutException e){
-      ClientLogger.log("Received no response from server for request: " + requestId);
+    } catch(SocketTimeoutException e) {
+      ClientLogger.log("Request timed out.. received no response from server for request: "
+          + requestId);
+    }
+  }
+
+  private static void populateKeyValues(DatagramSocket aSocket, InetAddress aHost, int serverPort)
+    throws IOException {
+    final int NUM_KEYS = 10;
+    //Pre-populating key value store
+    // Send PUT requests
+    for (int i = 0; i < NUM_KEYS; i++) {
+      String putString = generateUUID() + "::PUT::key" + i + "::value" + i;
+      sendRequest(aSocket, putString, aHost, serverPort);
+    }
+
+    // Send GET requests
+    for (int i = 0; i < NUM_KEYS; i++) {
+      String getString = generateUUID() + "::GET::key" + i;
+      sendRequest(aSocket, getString, aHost, serverPort);
     }
   }
 }

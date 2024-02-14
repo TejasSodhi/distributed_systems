@@ -7,75 +7,33 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.UUID;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
-
-public class TCPClient {
-    
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Usage: java client.Client <serverIP> <port>");
-            System.exit(1);
-        }
-
-        String serverIP = args[0];
-        int serverPort = Integer.parseInt(args[1]);
-
-        try (Socket socket = new Socket(serverIP, serverPort)) {
+public class TCPClient extends AbstractClient {
+    public void startClient(String serverIP, int serverPort) {
+        Socket socket = null;
+        try {
+            socket = new Socket(serverIP, serverPort);
             socket.setSoTimeout(5000);
-
-            System.out.println("Connected to the server");
-            ClientLogger.log("Connected to the server");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         try (
-            BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
+                BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
         ) {
-            // prepopulate the data
+            System.out.println("Connected to the server");
+            ClientLogger.log("Connected to the server");
             populateKeyValues(in, out);
 
-            // this code snippet is used to make the client interactive
             while (true) {
-                System.out.println("Which operation do you want to use?");
-                System.out.println("1. PUT");
-                System.out.println("2. GET");
-                System.out.println("3. DELETE");
-                System.out.print("Enter your choice (1/2/3): ");
-                String choice = userInput.readLine();
-
-                String operation;
-                switch (choice) {
-                    case "1":
-                        operation = "PUT";
-                        break;
-                    case "2":
-                        operation = "GET";
-                        break;
-                    case "3":
-                        operation = "DELETE";
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please enter 1, 2, or 3.");
-                        continue;
+                String request = generateRequestFromUserChoice(userInput);
+                if(request.isEmpty()) {
+                    continue;
                 }
-
-                if (operation.equals("PUT")) {
-                    System.out.print("Please enter the key (integer): ");
-                    String key = userInput.readLine();
-                    System.out.print("Please enter the value for the key (integer): ");
-                    String value = userInput.readLine();
-                    String requestId = UUID.randomUUID().toString();
-                    String request = requestId + "::" + operation + "::" + key + "::value" + value;
-                } else {
-                    System.out.print("Please enter the key (integer): ");
-                    String key = userInput.readLine();
-                    String requestId = UUID.randomUUID().toString();
-                    String request = requestId + "::" + operation + "::" + key;
-                }
-
                 sendRequest(out, in, request);
 
                 System.out.print("Do you want to perform another operation? (yes/no): ");
@@ -89,8 +47,16 @@ public class TCPClient {
         }
     }
 
+    private static long generateChecksum(String requestString) {
+        byte [] m = requestString.getBytes();
+        Checksum crc32 = new CRC32();
+        crc32.update(m, 0, m.length);
+        return crc32.getValue();
+    }
+
     private static void sendRequest(PrintWriter out, BufferedReader in, String request) throws IOException {
         try{
+            request = generateChecksum(request) + "::" + request;
             // Send request to server
             out.println(request);
             // Receive response from server
@@ -108,8 +74,7 @@ public class TCPClient {
     }
 
     private static void populateKeyValues(BufferedReader in, PrintWriter out) {
-
-        NUM_KEYS = 10
+        final int NUM_KEYS = 10;
         try {
             // PUT requests
             for (int i = 1; i <= NUM_KEYS; i++) {
@@ -120,8 +85,8 @@ public class TCPClient {
                 String putString = requestId + "::PUT::key" + key + "::value" + value;
 
                 sendRequest(out, in, putString);
-                System.out.println("Prepopulated key " + key + " with value " + value);
-                ClientLogger.log("Prepopulated key " + key + " with value " + value);
+                System.out.println("Pre-populated key" + key + " with value " + value);
+                ClientLogger.log("Pre-populated key" + key + " with value " + value);
             }
             //GET requests
             for (int i = 1; i <= NUM_KEYS; i++) {
@@ -131,8 +96,8 @@ public class TCPClient {
                 String getString = requestId + "::GET::key" + key;
 
                 sendRequest(out, in, getString);
-                System.out.println("Prepopulated key " + key + " with value " + value);
-                ClientLogger.log("Prepopulated key " + key + " with value " + value);
+                System.out.println("GET key" + key);
+                ClientLogger.log("GET key" + key);
             }
         } catch (IOException e) {
             e.printStackTrace();

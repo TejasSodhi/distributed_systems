@@ -1,5 +1,12 @@
 package server;
 
+import java.io.IOException;
+import java.net.Socket;
+
+/**
+ * Abstract class that implements common functionalities like processing key value store read/write
+ * for any type of server.
+ */
 public abstract class AbstractServer implements IServer {
   private static final KeyValueStore keyValueStore = new KeyValueStore();
   static final ServerLogger serverLogger = new ServerLogger();
@@ -7,14 +14,14 @@ public abstract class AbstractServer implements IServer {
   public String processRequest(String inputLine) {
     String[] tokens = inputLine.split("::");
     System.out.println(inputLine);
-    if (tokens.length < 3) {
+    if (tokens.length < 4) {
       return "Invalid request format";
     }
 
     String requestId = tokens[0];
-    String operation = tokens[1];
-    String key = tokens[2];
-    String value = tokens.length > 3 ? tokens[3] : null;
+    String operation = tokens[2];
+    String key = tokens[3];
+    String value = tokens.length > 4 ? tokens[4] : null;
 
     switch (operation.toUpperCase()) {
       case "PUT":
@@ -25,12 +32,19 @@ public abstract class AbstractServer implements IServer {
         return requestId + ": Key '" + key + "' stored with value '" + value + "'";
       case "GET":
         String storedValue = keyValueStore.get(key);
-        return (storedValue != null) ? requestId + ": Value for key '" + key + "': " + storedValue : "Key '" + key + "' not found";
+        return (storedValue != null) ? (requestId + ": Value for key '" + key + "': " + storedValue)
+            : (requestId + ": Key '" + key + "' not found");
       case "DELETE":
         String removedValue = keyValueStore.delete(key);
-        return (removedValue != null) ? requestId + ": Deleted key '" + key + "' with value '" + removedValue + "'" : "Key '" + key + "' not found";
+        return (removedValue != null) ? (requestId + ": Deleted key '" + key + "' with value '" + removedValue + "'")
+            : requestId + ": Key '" + key + "' not found";
       default:
         return requestId + ": Unsupported operation: " + operation;
     }
+  }
+
+  @Override
+  public void handleRequest(Socket clientSocket) throws IOException {
+    serverLogger.log("Unable to process request. Server handle request behavior undefined");
   }
 }
