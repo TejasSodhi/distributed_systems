@@ -6,7 +6,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 
 public class TCPClient {
@@ -56,8 +59,16 @@ public class TCPClient {
         }
     }
 
+    private static long generateChecksum(String requestString) {
+        byte [] m = requestString.getBytes();
+        Checksum crc32 = new CRC32();
+        crc32.update(m, 0, m.length);
+        return crc32.getValue();
+    }
+
     private static void sendRequest(PrintWriter out, BufferedReader in, String request) throws IOException {
         try{
+            request = generateChecksum(request) + "::" + request;
             // Send request to server
             out.println(request);
             // Receive response from server

@@ -14,14 +14,14 @@ public abstract class AbstractServer implements IServer {
   public String processRequest(String inputLine) {
     String[] tokens = inputLine.split("::");
     System.out.println(inputLine);
-    if (tokens.length < 3) {
+    if (tokens.length < 4) {
       return "Invalid request format";
     }
 
     String requestId = tokens[0];
-    String operation = tokens[1];
-    String key = tokens[2];
-    String value = tokens.length > 3 ? tokens[3] : null;
+    String operation = tokens[2];
+    String key = tokens[3];
+    String value = tokens.length > 4 ? tokens[4] : null;
 
     switch (operation.toUpperCase()) {
       case "PUT":

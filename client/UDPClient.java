@@ -3,6 +3,8 @@ package client;
 import java.net.*;
 import java.io.*;
 import java.util.UUID;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 /**
  * This represents the UDP client which communicates to the UDP server over a given port and host
@@ -52,16 +54,25 @@ public class UDPClient {
     return uuid.toString();
   }
 
+  private static long generateChecksum(String requestString) {
+    byte [] m = requestString.getBytes();
+    Checksum crc32 = new CRC32();
+    crc32.update(m, 0, m.length);
+    return crc32.getValue();
+  }
+
   private static void sendRequest(DatagramSocket aSocket, String requestString, InetAddress aHost,
       int serverPort) throws IOException {
 
     // Parse request information from the request string.
     String[] requestToken = requestString.split("::");
-    String requestId = requestToken[0];
     String action = requestToken[1];
 
     // creating datagram packet
-    byte [] m = requestString.getBytes();
+    long requestId = generateChecksum(requestString);
+    requestString = requestId + "::" + requestString;
+
+    byte[] m = requestString.getBytes();
     DatagramPacket request = new DatagramPacket(m, m.length, aHost, serverPort);
 
     // sending datagram packet
@@ -77,9 +88,10 @@ public class UDPClient {
       aSocket.receive(reply);
       String response = new String(reply.getData(), 0, reply.getLength());
       String[] responseToken = response.split(":");
+      long responseRequestId = Long.parseLong(responseToken[0]);
 
       // validating malformed responses from server
-      if(!responseToken[0].equals(requestId)) {
+      if(responseRequestId != requestId) {
         ClientLogger.log("Received Malformed response for request: " + requestId +
           " ; Received response for " + responseToken[0]);
       } else {
