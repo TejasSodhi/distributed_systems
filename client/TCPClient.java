@@ -6,22 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.Arrays;
 import java.util.UUID;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-
-public class TCPClient {
-    public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Usage: java client.Client <serverIP> <port>");
-            System.exit(1);
-        }
-
-        String serverIP = args[0];
-        int serverPort = Integer.parseInt(args[1]);
-
+public class TCPClient extends AbstractClient {
+    public void startClient(String serverIP, int serverPort) {
         Socket socket = null;
         try {
             socket = new Socket(serverIP, serverPort);
@@ -37,22 +27,20 @@ public class TCPClient {
         ) {
             System.out.println("Connected to the server");
             ClientLogger.log("Connected to the server");
+            populateKeyValues(in, out);
 
-            int n = 100;
-            for(int i = 0; i < n; i++) {
-                UUID uuid = UUID.randomUUID();
-                String requestId = uuid.toString();
+            while (true) {
+                String request = generateRequestFromUserChoice(userInput);
+                if(request.isEmpty()) {
+                    continue;
+                }
+                sendRequest(out, in, request);
 
-                String putString = requestId + "::PUT::key" + i + "::value" + i;
-                sendRequest(out, in, putString);
-            }
-
-            for(int i = 0; i < n; i++) {
-                UUID uuid = UUID.randomUUID();
-                String requestId = uuid.toString();
-
-                String getString = requestId + "::GET::key" + i;
-                sendRequest(out, in, getString);
+                System.out.print("Do you want to perform another operation? (yes/no): ");
+                String anotherOperation = userInput.readLine().toLowerCase();
+                if (!anotherOperation.equals("yes")) {
+                    break;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,6 +70,37 @@ public class TCPClient {
             String requestId = strArr[0];
             System.out.println("Received no response from the server for request id : "+requestId);
             ClientLogger.log("Received no response from the server for the request id : "+requestId);
+        }
+    }
+
+    private static void populateKeyValues(BufferedReader in, PrintWriter out) {
+        final int NUM_KEYS = 10;
+        try {
+            // PUT requests
+            for (int i = 1; i <= NUM_KEYS; i++) {
+                UUID uuid = UUID.randomUUID();
+                String requestId = uuid.toString();
+                String key = Integer.toString(i);
+                String value = Integer.toString(i * 10);
+                String putString = requestId + "::PUT::key" + key + "::value" + value;
+
+                sendRequest(out, in, putString);
+                System.out.println("Pre-populated key" + key + " with value " + value);
+                ClientLogger.log("Pre-populated key" + key + " with value " + value);
+            }
+            //GET requests
+            for (int i = 1; i <= NUM_KEYS; i++) {
+                UUID uuid = UUID.randomUUID();
+                String requestId = uuid.toString();
+                String key = Integer.toString(i);
+                String getString = requestId + "::GET::key" + key;
+
+                sendRequest(out, in, getString);
+                System.out.println("GET key" + key);
+                ClientLogger.log("GET key" + key);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

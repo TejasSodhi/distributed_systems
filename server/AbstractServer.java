@@ -32,10 +32,12 @@ public abstract class AbstractServer implements IServer {
         return requestId + ": Key '" + key + "' stored with value '" + value + "'";
       case "GET":
         String storedValue = keyValueStore.get(key);
-        return (storedValue != null) ? requestId + ": Value for key '" + key + "': " + storedValue : "Key '" + key + "' not found";
+        return (storedValue != null) ? (requestId + ": Value for key '" + key + "': " + storedValue)
+            : (requestId + ": Key '" + key + "' not found");
       case "DELETE":
         String removedValue = keyValueStore.delete(key);
-        return (removedValue != null) ? requestId + ": Deleted key '" + key + "' with value '" + removedValue + "'" : "Key '" + key + "' not found";
+        return (removedValue != null) ? (requestId + ": Deleted key '" + key + "' with value '" + removedValue + "'")
+            : requestId + ": Key '" + key + "' not found";
       default:
         return requestId + ": Unsupported operation: " + operation;
     }
