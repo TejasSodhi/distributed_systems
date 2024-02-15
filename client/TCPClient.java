@@ -16,8 +16,12 @@ public class TCPClient extends AbstractClient {
         try {
             socket = new Socket(serverIP, serverPort);
             socket.setSoTimeout(5000);
+            System.out.println("Connected to the server");
+            ClientLogger.log("Connected to the server");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Couldn't connect to server at mentioned IP and port");
+            ClientLogger.log("Couldn't connect to server at mentioned IP and port\"");
+            System.exit(1);
         }
 
         try (
@@ -25,8 +29,6 @@ public class TCPClient extends AbstractClient {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)
         ) {
-            System.out.println("Connected to the server");
-            ClientLogger.log("Connected to the server");
             populateKeyValues(in, out);
 
             while (true) {
