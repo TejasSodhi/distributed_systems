@@ -91,6 +91,8 @@ public class UDPClient extends AbstractClient {
         System.out.println(action+" Reply: " + new String(reply.getData(), 0, reply.getLength()));
       }
     } catch(SocketTimeoutException e) {
+      System.out.println("Request timed out.. received no response from server for request: "
+        + requestId);
       ClientLogger.log("Request timed out.. received no response from server for request: "
           + requestId);
     }

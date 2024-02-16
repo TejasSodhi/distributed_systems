@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public abstract class AbstractClient implements IClient {
   public String generateRequestFromUserChoice(BufferedReader userInput) throws IOException {
-    System.out.println("[UDP-CLIENT]: Which operation do you want to use?");
+    System.out.println("Which operation do you want to use?");
     System.out.println("1. PUT");
     System.out.println("2. GET");
     System.out.println("3. DELETE");
