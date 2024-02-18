@@ -1,5 +1,8 @@
 package client;
 
+/**
+ * This class starts an instance of a UDP client.
+ */
 public class ClientAppUDP {
   public static void main(String[] args) {
     if (args.length < 2) {

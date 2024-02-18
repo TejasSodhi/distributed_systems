@@ -1,5 +1,8 @@
 package server;
 
+/**
+ * This class starts a TCP server by creating an instance of a TCP server.
+ */
 public class ServerAppTCP {
   public static void main(String[] args) {
     if (args.length != 1) {

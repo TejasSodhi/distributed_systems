@@ -103,14 +103,20 @@ public class UDPClient extends AbstractClient {
     final int NUM_KEYS = 10;
     //Pre-populating key value store
     // Send PUT requests
-    for (int i = 0; i < NUM_KEYS; i++) {
+    for (int i = 1; i <= NUM_KEYS * 2; i++) {
       String putString = generateUUID() + "::PUT::key" + i + "::value" + i;
       sendRequest(aSocket, putString, aHost, serverPort);
     }
 
     // Send GET requests
-    for (int i = 0; i < NUM_KEYS; i++) {
+    for (int i = 1; i <= NUM_KEYS * 2; i++) {
       String getString = generateUUID() + "::GET::key" + i;
+      sendRequest(aSocket, getString, aHost, serverPort);
+    }
+
+    //DELETE requests
+    for (int i = 5; i <= NUM_KEYS*2; i++) {
+      String getString = generateUUID() + "::DELETE::key" + i;
       sendRequest(aSocket, getString, aHost, serverPort);
     }
   }

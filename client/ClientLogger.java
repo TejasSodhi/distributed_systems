@@ -6,6 +6,9 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * This represents a logger for writing all the information/logs generated into client logs.
+ */
 public class ClientLogger {
     private static final String LOG_FILE = "client_log.txt";
 

@@ -10,6 +10,9 @@ import java.util.UUID;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+/**
+ * This is a TCP Client class, that interacts with the server.
+ */
 public class TCPClient extends AbstractClient {
     public void startClient(String serverIP, int serverPort) {
         Socket socket = null;

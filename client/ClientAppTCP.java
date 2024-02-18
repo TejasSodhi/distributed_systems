@@ -1,6 +1,9 @@
 package client;
 
 
+/**
+ * This class starts an instance of a TCP client.
+ */
 public class ClientAppTCP {
   public static void main(String[] args) {
     if (args.length != 2) {
