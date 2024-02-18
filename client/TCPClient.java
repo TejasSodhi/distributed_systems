@@ -79,7 +79,7 @@ public class TCPClient extends AbstractClient {
         final int NUM_KEYS = 10;
         try {
             // PUT requests
-            for (int i = 1; i <= NUM_KEYS; i++) {
+            for (int i = 1; i <= NUM_KEYS*2; i++) {
                 UUID uuid = UUID.randomUUID();
                 String requestId = uuid.toString();
                 String key = Integer.toString(i);
@@ -91,7 +91,7 @@ public class TCPClient extends AbstractClient {
                 ClientLogger.log("Pre-populated key" + key + " with value " + value);
             }
             //GET requests
-            for (int i = 1; i <= NUM_KEYS; i++) {
+            for (int i = 1; i <= NUM_KEYS*2; i++) {
                 UUID uuid = UUID.randomUUID();
                 String requestId = uuid.toString();
                 String key = Integer.toString(i);
@@ -100,6 +100,17 @@ public class TCPClient extends AbstractClient {
                 sendRequest(out, in, getString);
                 System.out.println("GET key" + key);
                 ClientLogger.log("GET key" + key);
+            }
+            //DELETE requests
+            for (int i = 5; i <= NUM_KEYS*2; i++) {
+                UUID uuid = UUID.randomUUID();
+                String requestId = uuid.toString();
+                String key = Integer.toString(i);
+                String deleteString = requestId + "::DELETE::key" + key;
+
+                sendRequest(out, in, deleteString);
+                System.out.println("DELETE key" + key);
+                ClientLogger.log("DELETE key" + key);
             }
         } catch (IOException e) {
             e.printStackTrace();

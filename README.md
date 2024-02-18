@@ -77,3 +77,9 @@ UDP each
 * One use case of such a single threaded server client application could be a “web server” which can be used to handle
 * HTTP requests. One application where such a web server can be used is a “financial trading systems” where there is 
 * one server to handle the trade and market data requests of clients to ensure timely and accurate transactions.
+
+
+
+# OUTPUT and SCREENSHOTS
+
+* for outputs to different edge cases , please navigate to screenshots folder.
