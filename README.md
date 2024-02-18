@@ -1,3 +1,7 @@
+# Team Members
+1. Tejas Sodhi (sodhi.t@northeastern.edu)
+2. Arush Agarwal (agarwal.arush1@northeastern.edu)
+3. Aadish Deshpande (deshpande.aa@northeastern.edu)
 # Project Readme
 
 [//]: # (## General guidelines)
